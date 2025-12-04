@@ -1,235 +1,111 @@
+## 모니터링 확인용 맵
+
+서빙 로봇의 **맵 이미지와 노드 정보를 모니터링하기 위한 웹 뷰어**입니다.  
+운영 환경에서는 CloudFront를 통해 배포되어, 로봇 운영/관제 시에 빠르게 맵 상태를 확인할 수 있도록 돕습니다.
+
+실제 배포 예시 도메인:  
+[`https://d2dmdwvwj99a8x.cloudfront.net/`](https://d2dmdwvwj99a8x.cloudfront.net/)
+
 ---
-layout: home
-title: Jekyll Gitbook Theme
-permalink: /
+
+### 주요 기능
+
+- **맵 ID를 기반으로 한 맵 이미지 조회**
+  - URL 쿼리 파라미터 `mapId`를 이용해 특정 맵을 조회합니다.
+  - 예: `?mapId=2`, `?mapId=2,5,19`
+- **여러 맵 동시 표시**
+  - `mapId=2,5,6` 처럼 쉼표(,)로 구분된 여러 ID를 한 번에 표시할 수 있습니다.
+- **허용된 맵 ID 검증**
+  - 코드 상에서 허용된 ID만 로딩합니다: `['2', '5', '6', '19', '909']`
+  - 잘못된 ID는 오류 메시지로 안내됩니다.
+- **S3 기반 맵 이미지 로딩**
+  - `https://hprobot-bucket.s3.ap-northeast-2.amazonaws.com/map_images/map-background-{mapId}-monitoring.png` 형태의 이미지를 불러옵니다.
+- **에러 메시지 출력**
+  - `mapId`가 없는 경우
+  - 유효하지 않은 `mapId`가 포함된 경우
+  - 이미지 로드에 실패한 경우
+
 ---
 
-Make Jelly site have a GitBook look!
+### 기술 스택
 
-## Demo
+- **언어**: TypeScript
+- **번들/빌드**: `tsc` (TypeScript 컴파일러)
+- **패키지 매니저**: `pnpm`
+- **호스팅**: 정적 호스팅(S3 + CloudFront 등) 가정
 
-Live demo on Github Pages: [https://sighingnow.github.io/jekyll-gitbook](https://sighingnow.github.io/jekyll-gitbook)
-
-[![Jekyll Themes](https://img.shields.io/badge/featured%20on-JekyllThemes-red.svg)](https://jekyll-themes.com/jekyll-gitbook/)
-
-## Why Jekyll with GitBook
-
-GitBook is an amazing frontend style to present and organize contents (such as book chapters
-and blogs) on Web. The typical to deploy GitBook at [Github Pages][1]
-is building HTML files locally and then push to Github repository, usually to the `gh-pages`
-branch. It's quite annoying to repeat such workload and make it hard for people do version
-control via git for when there are generated HTML files to be staged in and out.
-
-This theme takes style definition out of generated GitBook site and provided the template
-for Jekyll to rendering markdown documents to HTML, thus the whole site can be deployed
-to [Github Pages][1] without generating and uploading HTML bundle every time when there are
-changes to the original repo.
-
-## How to Get Started
-
-This theme can be used just as other [Jekyll themes][1] and support [remote theme][12],
-see [the official guide][13] as well.
-
-You can introduce this jekyll theme into your own site by either
-
-- [Fork][3] this repository and add your markdown posts to the `_posts` folder.
-- Use as a remote theme in your [`_config.yml`][14](just like what we do for this
-  site itself),
-
-```yaml
-remote_theme: sighingnow/jekyll-gitbook
-```
-
-### Deploy Locally with Jekyll Serve
-
-This theme can be ran locally using Ruby and Gemfiles.
-
-[Testing your GitHub Pages site locally with Jekyll](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/testing-your-github-pages-site-locally-with-jekyll) - GitHub
-
-## Full-text search
-
-The search functionality in jekyll-gitbook theme is powered by the [gitbook-plugin-search-pro][5] plugin and is enabled by default.
-
-[https://sighingnow.github.io/jekyll-gitbook/?q=generated](https://sighingnow.github.io/jekyll-gitbook/?q=generated)
-
-## Code highlight
-
-The code highlight style is configurable the following entry in `_config.yaml`:
-
-```yaml
-syntax_highlighter_style: colorful
-```
-
-The default code highlight style is `colorful`, the full supported styles can be found from [the rouge repository][6]. Customized
-style can be added to [./assets/gitbook/rouge/](./assets/gitbook/rouge/).
-
-## How to generate TOC
-
-The jekyll-gitbook theme leverages [jekyll-toc][4] to generate the *Contents* for the page.
-The TOC feature is not enabled by default. To use the TOC feature, modify the TOC
-configuration in `_config.yml`:
-
-```yaml
-toc:
-    enabled: true
-    h_min: 1
-    h_max: 3
-```
-
-## Google Analytics, etc.
-
-The jekyll-gitboook theme supports embedding the [Google Analytics][7], [CNZZ][8] and [Application Insights][9] website analytical tools with the following
-minimal configuration in `_config.yaml`:
-
-```yaml
-tracker:
-  google_analytics: "<YOUR GOOGLE ANALYTICS KEY, e.g, UA-xxxxxx-x>"
-```
-
-Similarly, CNZZ can be added with the following configuration in `_config.yaml`
-
-```yaml
-tracker:
-  cnzz: "<YOUR CNZZ ANALYTICS KEY, e.g., xxxxxxxx>"
-```
-
-Application Insights can be added with the following configuration in `_config.yaml`
-
-```yaml
-tracker:
-  application_insights: "<YOUR APPLICATION INSIGHTS CONNECTION STRING>"
-```
-
-## Disqus comments
-
-[Disqus](https://disqus.com/) comments can be enabled by adding the following configuration in `_config.yaml`:
-
-```yaml
-disqushandler: "<YOUR DISQUS SHORTNAME>"
-```
-
-## Jekyll collections
-
-Jekyll's [collections][15] is supported to organize the pages in a more fine-grained manner, e.g.,
-
-```yaml
-collections:
-  pages:
-    output: true
-    sort_by: date
-    permalink: /:collection/:year-:month-:day-:title:output_ext
-  others:
-    output: true
-    sort_by: date
-    permalink: /:collection/:year-:month-:day-:title:output_ext
-```
-
-An optional `ordered_collections` key can be added to `_config.yaml` to control the order of collections in the sidebar:
-
-```yaml
-ordered_collections:
-  - posts
-  - pages
-  - others
-```
-
-If not specified, the order of collections would be decided by Jekyll. Note that the key `posts` is a special collection
-that indicates the `_posts` pages of Jekyll.
-
-## Extra StyleSheet or Javascript elements
-
-You can add extra CSS or JavaScript references using configuration collections:
-
-- extra_css: for additional style sheets. If the url does not start by http, the path must be relative to the root of the site, without a starting `/`.
-- extra_header_js: for additional scripts to be included in the `<head>` tag, after the `extra_css` has been added. If the url does not start by http, the path must be relative to the root of the site, without a starting `/`.
-- extra_footer_js: for additional scripts to be included at the end of the HTML document, just before the site tracking script. If the url does not start by http, the path must be relative to the root of the site, without a starting `/`.
-
-## Customizing font settings
-
-The fonts can be customized by modifying the `.book.font-family-0` and `.book.font-family-1` entry in [`./assets/gitbook/custom.css`][10],
-
-```css
-.book.font-family-0 {
-    font-family: Georgia, serif;
-}
-.book.font-family-1 {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-```
-
-## Tips, Warnings and Dangers blocks
-
-The jekyll-gitbook theme supports customized kramdown attributes (`{: .block-tip }`, `{: .block-warning }`,
-`{: .block-danger }`) like that displayed in [the discord.js website][11]. The marker can be used like
-
-```markdown
-> ##### TIP
->
-> This guide is last tested with @napi-rs/canvas^0.1.20, so make sure you have
-> this or a similar version after installation.
-{: .block-tip }
-```
-
-Rendered page can be previewed from
-
-[https://sighingnow.github.io/jekyll-gitbook/jekyll/2022-06-30-tips_warnings_dangers.html](https://sighingnow.github.io/jekyll-gitbook/jekyll/2022-06-30-tips_warnings_dangers.html)
-
-## Cover image inside pages
-
-The jekyll-gitbook theme supports adding a cover image to a specific page by adding
-a `cover` field to the page metadata:
-
-```diff
-  ---
-  title: Page with cover image
-  author: Tao He
-  date: 2022-05-24
-  category: Jekyll
-  layout: post
-+ cover: /assets/jekyll-gitbook/dinosaur.gif
-  ---
-```
-
-The effect can be previewed from
-
-[https://sighingnow.github.io/jekyll-gitbook/jekyll/2022-05-24-page_cover.html](https://sighingnow.github.io/jekyll-gitbook/jekyll/2022-05-24-page_cover.html)
-
-## Diagrams with mermaid.js
-
-This jekyll-theme supports [mermaid.js](https://mermaid.js.org/) to render diagrams
-in markdown.
-
-To enable the mermaid support, you need to set `mermaid: true` in the front matter
-of your post.
-
-```markdown
 ---
-mermaid: true
+
+### 프로젝트 구조 (요약)
+
+- `index.html`  
+  - 진입 HTML 파일  
+  - `#map-images`, `#error-message` 컨테이너를 제공하고 `./dist/main.js`를 로드합니다.
+- `src/main.ts`  
+  - URL 쿼리 파라미터에서 `mapId`를 읽어 맵 이미지를 생성/표시하는 핵심 로직입니다.
+- `style.css`  
+  - 기본 레이아웃 및 스타일 정의.
+- `tsconfig.json`  
+  - `src`를 입력, `dist`를 출력으로 하는 TypeScript 컴파일 설정.
+
 ---
+
+### 로컬 개발 / 빌드
+
+#### 1. 요구 사항
+
+- Node.js `>= 18`
+- `pnpm` (예: `pnpm@10.13.1`)
+
+#### 2. 의존성 설치
+
+```bash
+pnpm install
 ```
 
-The example can be previewed from
+#### 3. 빌드
 
-[https://sighingnow.github.io/jekyll-gitbook/jekyll/2023-08-31-mermaid.html](https://sighingnow.github.io/jekyll-gitbook/jekyll/2023-08-31-mermaid.html)
+```bash
+pnpm build
+```
 
-## License
+빌드가 성공하면, TypeScript 소스(`src/main.ts`)가 JavaScript로 컴파일되어 `dist/main.js`가 생성됩니다.
 
-This work is open sourced under the Apache License, Version 2.0.
+#### 4. 정적 서버로 확인하기 (예시)
 
-Copyright 2019 Tao He.
+아래와 같이 간단한 정적 서버를 띄워서 `index.html`을 확인할 수 있습니다. (도구는 선호에 따라 자유)
 
-[1]: https://pages.github.com
-[2]: https://pages.github.com/themes
-[3]: https://github.com/sighingnow/jekyll-gitbook/fork
-[4]: https://github.com/allejo/jekyll-toc
-[5]: https://github.com/gitbook-plugins/gitbook-plugin-search-pro
-[6]: https://github.com/rouge-ruby/rouge/tree/master/lib/rouge/themes
-[7]: https://analytics.google.com/analytics/web/
-[8]: https://www.cnzz.com/
-[9]: https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview
-[10]: https://github.com/sighingnow/jekyll-gitbook/blob/master/gitbook/custom.css
-[11]: https://discordjs.guide/popular-topics/canvas.html#setting-up-napi-rs-canvas
-[12]: https://rubygems.org/gems/jekyll-remote-theme
-[13]: https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/adding-a-theme-to-your-github-pages-site-using-jekyll
-[14]: https://github.com/sighingnow/jekyll-gitbook/blob/master/_config.yml
-[15]: https://jekyllrb.com/docs/collections/
+```bash
+# 예: npx serve 를 사용하는 경우
+npx serve .
+```
+
+브라우저에서 아래와 같이 접속해 테스트할 수 있습니다.
+
+- `http://localhost:3000/index.html?mapId=2`
+- `http://localhost:3000/index.html?mapId=2,5,19`
+
+---
+
+### 사용 방법 (URL 파라미터 규칙)
+
+- **단일 맵**:  
+  - `...?mapId=2`
+- **여러 맵 동시 조회**:  
+  - `...?mapId=2,5,6`
+- **허용된 맵 ID**:  
+  - 현재 코드 상 허용된 ID는 `2, 5, 6, 19, 909` 입니다.
+  - 이 외의 ID는 `유효하지 않은 맵 ID`로 에러 메시지가 출력됩니다.
+
+#### 에러 케이스
+
+- `mapId` 파라미터 자체가 없는 경우
+  - 화면 상단에 `맵 ID가 제공되지 않았습니다.` 메시지가 표시되고, 스크립트에서 에러를 발생시킵니다.
+- `mapId`에 허용되지 않은 ID가 포함된 경우
+  - 예: `?mapId=1,2,999`
+  - `유효하지 않은 맵 ID: 1, 999` 와 같은 안내가 표시됩니다.
+- 이미지 로드 실패
+  - S3에 이미지가 없거나 네트워크 오류 시
+  - `맵 ID {id}의 이미지를 불러올 수 없습니다.` 메시지가 표시됩니다.
+
+
